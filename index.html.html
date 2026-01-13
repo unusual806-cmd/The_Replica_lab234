@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The replica lab | Order Link</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Inter:wght@400;700&display=swap');
+        .boss-font { font-family: 'Syncopate', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <nav class="p-6 flex justify-between items-center border-b border-white/20 sticky top-0 bg-black/90 backdrop-blur-md z-50">
+        <h1 class="boss-font text-xl tracking-tighter">The replica lab</h1>
+        <a href="https://www.instagram.com/the_replica_lab?igsh=MXRyaWFhYjY3cmIwMQ==" class="text-xs font-bold border border-white px-4 py-2 hover:bg-white hover:text-black transition">FOLLOW US</a>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6 py-12">
+        <div id="shop-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+    </main>
+
+    <div id="modal" class="fixed inset-0 bg-white/10 backdrop-blur-xl hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white text-black p-8 w-full max-w-md rounded-3xl">
+            <h2 id="m-name" class="text-3xl font-black uppercase mb-1">ITEM NAME</h2>
+            <p id="m-price" class="text-xl mb-6 font-bold text-gray-400"></p>
+            
+            <div class="space-y-4">
+                <label class="block text-xs font-black uppercase">Select Size</label>
+                <select id="m-size" class="w-full border-2 border-gray-100 p-4 rounded-xl font-bold outline-none focus:border-black transition">
+                    </select>
+                
+                <label class="block text-xs font-black uppercase">Delivery Address</label>
+                <textarea id="m-address" placeholder="Full Address + Zip Code" class="w-full border-2 border-gray-100 p-4 rounded-xl font-bold outline-none focus:border-black transition" rows="3"></textarea>
+                
+                <button onclick="checkout()" class="w-full bg-black text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-800 transition shadow-xl">
+                    Order via Instagram
+                </button>
+                <button onclick="closeModal()" class="w-full text-xs font-bold uppercase text-gray-400 mt-2">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. EDIT YOUR INSTAGRAM USERNAME HERE ---
+        const INSTA_USERNAME = "the_replica_lab"; 
+
+        // --- 2. ADD YOUR PRODUCTS HERE ---
+        const PRODUCTS = [
+            {
+                name: "Alpha Hoodie",
+                price: "80",
+                sizes: ["S", "M", "L", "XL"],
+                img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800"
+            },
+            {
+                name: "Midnight Cargo",
+                price: "95",
+                sizes: ["30", "32", "34"],
+                img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800"
+            }
+        ];
+
+        // --- RENDER LOGIC ---
+        const grid = document.getElementById('shop-grid');
+        PRODUCTS.forEach((p, i) => {
+            grid.innerHTML += `
+                <div class="group relative bg-zinc-900 rounded-3xl overflow-hidden border border-white/5 cursor-pointer" onclick="openModal(${i})">
+                    <div class="h-[450px] overflow-hidden">
+                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black to-transparent">
+                        <h3 class="boss-font text-lg">${p.name}</h3>
+                        <p class="font-bold opacity-60">$${p.price}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        let currentItem = null;
+
+        function openModal(i) {
+            currentItem = PRODUCTS[i];
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('m-name').innerText = currentItem.name;
+            document.getElementById('m-price').innerText = "$" + currentItem.price;
+            document.getElementById('m-size').innerHTML = currentItem.sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+       function checkout() {
+    const size = document.getElementById('m-size').value;
+    const address = document.getElementById('m-address').value;
+    
+    if(!address) return alert("Please enter your delivery address");
+
+    // 1. Create the clean message
+    const message = `🔥 NEW ORDER FROM WEBSITE:\n\n` +
+                    `ITEM: ${currentItem.name}\n` +
+                    `SIZE: ${size}\n` +
+                    `ADDRESS: ${address}\n\n` +
+                    `Please confirm availability!`;
+    
+    // 2. Copy to clipboard automatically
+    const el = document.createElement('textarea');
+    el.value = message;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+
+    // 3. Change the Modal UI to show "Ready to Paste"
+    const modalContent = document.querySelector('#modal div');
+    modalContent.innerHTML = `
+        <div class="text-center py-6">
+            <div class="text-5xl mb-4">✅</div>
+            <h2 class="text-2xl font-black uppercase mb-2">Order Ready!</h2>
+            <p class="text-gray-500 mb-6 font-bold">Details copied to your clipboard. Just paste them in our DM.</p>
+            
+            <a href="https://ig.me/m/${INSTA_USERNAME}" 
+               class="block w-full bg-black text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-800 transition shadow-xl text-center">
+                OPEN INSTAGRAM DM
+            </a>
+            
+            <button onclick="location.reload()" class="mt-4 text-xs font-bold uppercase text-gray-400">Back to Shop</button>
+        </div>
+    `;
+} 
+   </script>
+</body>
+</html>
